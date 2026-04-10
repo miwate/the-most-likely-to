@@ -14,6 +14,8 @@ function nameFromFile(f) {
 
 // ─── Photo Upload Sub-Component ─────────────────
 function PhotoBank({ photos, setPhotos }) {
+  const [editingId, setEditingId] = useState(null);
+
   const onDrop = useCallback(
     (accepted) => {
       const newPhotos = accepted.map((file) => ({
@@ -42,6 +44,15 @@ function PhotoBank({ photos, setPhotos }) {
     );
   };
 
+  const commitEdit = () => setEditingId(null);
+
+  const cleanName = (name) =>
+    name.replace(/^[\d_]+/, "").replace(/[\d_]+$/, "").replace(/_/g, " ").trim();
+
+  const autoCleanAll = () => {
+    setPhotos((prev) => prev.map((p) => ({ ...p, name: cleanName(p.name) || p.name })));
+  };
+
   return (
     <div>
       <div
@@ -60,6 +71,14 @@ function PhotoBank({ photos, setPhotos }) {
       </div>
 
       {photos.length > 0 && (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+          <button className="btn btn-ghost btn-sm" type="button" onClick={autoCleanAll}>
+            Nettoyer les prénoms
+          </button>
+        </div>
+      )}
+
+      {photos.length > 0 && (
         <div className="photo-preview-grid">
           {photos.map((p) => (
             <div key={p.id} className="photo-preview-item">
@@ -71,19 +90,24 @@ function PhotoBank({ photos, setPhotos }) {
               >
                 ×
               </button>
-              <input
-                className="photo-preview-name"
-                value={p.name}
-                onChange={(e) => renamePhoto(p.id, e.target.value)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  width: 72,
-                  textAlign: "center",
-                  fontFamily: "inherit",
-                }}
-              />
+              {editingId === p.id ? (
+                <input
+                  className="photo-preview-name-input"
+                  value={p.name}
+                  autoFocus
+                  onChange={(e) => renamePhoto(p.id, e.target.value)}
+                  onBlur={commitEdit}
+                  onKeyDown={(e) => e.key === "Enter" && commitEdit()}
+                />
+              ) : (
+                <span
+                  className="photo-preview-name"
+                  onClick={() => setEditingId(p.id)}
+                  title="Cliquer pour modifier"
+                >
+                  {p.name}
+                </span>
+              )}
             </div>
           ))}
         </div>
@@ -186,6 +210,8 @@ export default function Create() {
     { text: "", choices: [] },
   ]);
   const [publishing, setPublishing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("");
 
   const addQuestion = () => {
     setQuestions((prev) => [...prev, { text: "", choices: [] }]);
@@ -211,7 +237,17 @@ export default function Create() {
   const handlePublish = async () => {
     if (!canPublish || publishing) return;
     setPublishing(true);
+    setProgress(0);
+    setProgressLabel("");
     setStep(2);
+
+    const totalSteps = photos.length + 1 + questions.length;
+    let completed = 0;
+    const advance = (label) => {
+      completed += 1;
+      setProgress(Math.round((completed / totalSteps) * 100));
+      setProgressLabel(label);
+    };
 
     try {
       const quizId = nanoid(8);
@@ -219,7 +255,9 @@ export default function Create() {
 
       // 1. Upload all photos
       const photoPathMap = {}; // localId → storage path
-      for (const photo of photos) {
+      for (let i = 0; i < photos.length; i++) {
+        const photo = photos[i];
+        setProgressLabel(`Upload photo ${i + 1} / ${photos.length}...`);
         const ext = photo.file.name.split(".").pop();
         const storagePath = `${quizId}/${photo.id}.${ext}`;
         const { error } = await supabase.storage
@@ -227,17 +265,21 @@ export default function Create() {
           .upload(storagePath, photo.file);
         if (error) throw error;
         photoPathMap[photo.id] = storagePath;
+        advance(`Upload photo ${i + 1} / ${photos.length}...`);
       }
 
       // 2. Create quiz
+      setProgressLabel("Création du quiz...");
       const { error: quizError } = await supabase
         .from("quizzes")
         .insert({ id: quizId, admin_key: adminKey, title });
       if (quizError) throw quizError;
+      advance("Création du quiz...");
 
       // 3. Create questions + choices
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
+        setProgressLabel(`Création de la question ${i + 1} / ${questions.length}...`);
         const { data: qRow, error: qError } = await supabase
           .from("questions")
           .insert({ quiz_id: quizId, text: q.text, sort_order: i })
@@ -258,9 +300,12 @@ export default function Create() {
           .from("choices")
           .insert(choiceRows);
         if (cError) throw cError;
+        advance(`Création de la question ${i + 1} / ${questions.length}...`);
       }
 
       // 4. Done - redirect to success screen with links
+      setProgress(100);
+      setProgressLabel("Quiz prêt !");
       toast.success("Quiz créé !");
       nav(`/quiz/${quizId}/admin?key=${adminKey}&new=1`);
     } catch (err) {
@@ -388,20 +433,14 @@ export default function Create() {
 
           {/* ─── STEP 2: Publishing ──────── */}
           {step === 2 && (
-            <div style={{ textAlign: "center", padding: "60px 0" }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  border: "3px solid var(--oak-light)",
-                  borderTopColor: "var(--dusk)",
-                  borderRadius: "50%",
-                  animation: "spin 0.8s linear infinite",
-                  margin: "0 auto 20px",
-                }}
-              />
-              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              <p className="text-ash">Upload des photos et création du quiz...</p>
+            <div className="publish-progress">
+              <div className="publish-progress-track">
+                <div className="publish-progress-fill" style={{ width: `${progress}%` }} />
+              </div>
+              <div>
+                <p className="publish-progress-label">{progressLabel}</p>
+                <p className="publish-progress-pct">{progress} %</p>
+              </div>
             </div>
           )}
         </div>
