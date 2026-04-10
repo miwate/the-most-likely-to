@@ -241,7 +241,8 @@ export default function Create() {
     setProgressLabel("");
     setStep(2);
 
-    const totalSteps = photos.length + 1 + questions.length;
+    const usedPhotoIds = new Set(questions.flatMap((q) => q.choices));
+    const totalSteps = usedPhotoIds.size + 1 + questions.length;
     let completed = 0;
     const advance = (label) => {
       completed += 1;
@@ -253,11 +254,12 @@ export default function Create() {
       const quizId = nanoid(8);
       const adminKey = nanoid(16);
 
-      // 1. Upload all photos
+      // 1. Upload only photos used in at least one question
+      const photosToUpload = photos.filter((p) => usedPhotoIds.has(p.id));
       const photoPathMap = {}; // localId → storage path
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-        setProgressLabel(`Upload photo ${i + 1} / ${photos.length}...`);
+      for (let i = 0; i < photosToUpload.length; i++) {
+        const photo = photosToUpload[i];
+        setProgressLabel(`Upload photo ${i + 1} / ${photosToUpload.length}...`);
         const ext = photo.file.name.split(".").pop();
         const storagePath = `${quizId}/${photo.id}.${ext}`;
         const { error } = await supabase.storage
@@ -265,7 +267,7 @@ export default function Create() {
           .upload(storagePath, photo.file);
         if (error) throw error;
         photoPathMap[photo.id] = storagePath;
-        advance(`Upload photo ${i + 1} / ${photos.length}...`);
+        advance(`Upload photo ${i + 1} / ${photosToUpload.length}...`);
       }
 
       // 2. Create quiz
