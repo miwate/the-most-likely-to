@@ -1,4 +1,4 @@
-# Who's Most Likely To...?
+# The Most Likely To
 
 A web platform where anyone can create their own "Who's most likely to..." quiz, share it via a unique link, and view results in real time.
 
