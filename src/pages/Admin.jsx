@@ -2,8 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { supabase, photoUrl } from "../supabase";
 import { toast } from "sonner";
-import Particles from "../components/Particles";
-import Blobs from "../components/Blobs";
 
 export default function Admin() {
   const { id } = useParams();
@@ -116,8 +114,6 @@ export default function Admin() {
   if (loading) {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="page" style={{ justifyContent: "center", minHeight: "100vh" }}>
           <p className="text-ash">Chargement...</p>
         </div>
@@ -129,8 +125,6 @@ export default function Admin() {
   if (!authorized) {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="page" style={{ justifyContent: "center", minHeight: "100vh" }}>
           <div style={{ textAlign: "center", padding: "2rem" }}>
             <h2 className="title-lg">Accès refusé</h2>
@@ -143,8 +137,6 @@ export default function Admin() {
 
   return (
     <>
-      <Particles />
-      <Blobs />
       <div className="page" style={{ paddingTop: 32, paddingBottom: 60 }}>
         <div className="container">
           {/* Header */}
@@ -212,7 +204,7 @@ export default function Admin() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                background: "rgba(60,79,118,0.08)",
+                background: "var(--oak-light)",
                 borderRadius: 100,
                 padding: "6px 16px",
                 marginBottom: 24,
@@ -226,7 +218,7 @@ export default function Admin() {
                   width: 8,
                   height: 8,
                   borderRadius: "50%",
-                  background: "#2ecc71",
+                  background: "var(--charcoal)",
                   animation: "pulse 2s infinite",
                 }}
               />

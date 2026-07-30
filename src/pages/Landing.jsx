@@ -1,14 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import Particles from "../components/Particles";
-import Blobs from "../components/Blobs";
 
 export default function Landing() {
   const nav = useNavigate();
 
   return (
     <>
-      <Particles />
-      <Blobs />
       <div className="page" style={{ justifyContent: "center", minHeight: "100vh" }}>
         <div className="container stagger" style={{ textAlign: "center" }}>
           <p className="pill reveal-up">Entre amis</p>
@@ -16,7 +12,7 @@ export default function Landing() {
           <h1 className="title-xl reveal-up">
             Qui est le
             <br />
-            <span className="accent-gradient">plus… ?</span>
+            plus… ?
           </h1>
 
           <p className="text-ash reveal-up" style={{ fontSize: "1.05rem", fontStyle: "italic", marginBottom: "2.5rem" }}>

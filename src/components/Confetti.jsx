@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const COLORS = ["#383F51", "#DDDBF1", "#3C4F76", "#D1BEB0", "#AB9F9D", "#506899"];
+const COLORS = ["#000000", "#4d4d4d", "#8c8c8c", "#c4c4c4"];
 
 export default function Confetti() {
   const ref = useRef(null);

@@ -13,8 +13,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         position="bottom-center"
         toastOptions={{
           style: {
-            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-            background: "#383F51",
+            fontFamily: "Arial, Helvetica, sans-serif",
+            background: "#000",
             color: "#fff",
             border: "none",
           },

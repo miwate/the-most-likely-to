@@ -1,12 +1,8 @@
-import Particles from "../components/Particles";
-import Blobs from "../components/Blobs";
 import Confetti from "../components/Confetti";
 
 export default function Done() {
   return (
     <>
-      <Particles />
-      <Blobs />
       <Confetti />
       <div
         className="page"

@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase, photoUrl } from "../supabase";
 import { usePlayer } from "../hooks/usePlayer";
-import Particles from "../components/Particles";
-import Blobs from "../components/Blobs";
 
 // ─── 3D tilt ──────────────────────────────
 function useTilt(ref) {
@@ -166,8 +164,6 @@ export default function Quiz() {
   if (loading) {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="quiz-screen">
           <p className="text-ash">Chargement...</p>
         </div>
@@ -179,8 +175,6 @@ export default function Quiz() {
   if (!quiz) {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="quiz-screen">
           <div style={{ textAlign: "center" }}>
             <h2 className="title-lg">Quiz introuvable</h2>
@@ -195,8 +189,6 @@ export default function Quiz() {
   if (phase === "voted") {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="quiz-screen">
           <div style={{ textAlign: "center", padding: "2rem" }}>
             <h2 className="title-lg reveal-up">Tu as déjà voté !</h2>
@@ -213,8 +205,6 @@ export default function Quiz() {
   if (phase === "intro") {
     return (
       <>
-        <Particles />
-        <Blobs />
         <div className="quiz-screen">
           <div className="stagger" style={{ textAlign: "center", padding: "2rem", maxWidth: 480 }}>
             <p className="pill reveal-up">Entre amis</p>
@@ -223,7 +213,7 @@ export default function Quiz() {
                 ? <>
                     {quiz.title.split("…")[0]}
                     <br />
-                    <span className="accent-gradient">…{quiz.title.split("…")[1]}</span>
+                    …{quiz.title.split("…")[1]}
                   </>
                 : quiz.title
               }
@@ -253,8 +243,6 @@ export default function Quiz() {
 
   return (
     <>
-      <Particles />
-      <Blobs />
       <div className="quiz-screen">
         <header className="quiz-header">
           <div className="progress-track">

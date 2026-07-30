@@ -4,8 +4,6 @@ import { useDropzone } from "react-dropzone";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 import { supabase } from "../supabase";
-import Particles from "../components/Particles";
-import Blobs from "../components/Blobs";
 
 // ─── Helpers ────────────────────────────────────
 function nameFromFile(f) {
@@ -165,7 +163,7 @@ function QuestionEditor({ question, index, photos, onChange, onRemove }) {
                 padding: "8px 6px",
                 borderRadius: 12,
                 border: selected ? "2px solid var(--dusk)" : "2px solid transparent",
-                background: selected ? "rgba(60,79,118,0.08)" : "transparent",
+                background: selected ? "var(--oak-light)" : "transparent",
                 cursor: "pointer",
                 transition: "all 0.2s",
                 minWidth: 60,
@@ -320,8 +318,6 @@ export default function Create() {
 
   return (
     <>
-      <Particles />
-      <Blobs />
       <div className="page" style={{ paddingTop: 40, paddingBottom: 60 }}>
         <div className="container">
           {/* Header */}
